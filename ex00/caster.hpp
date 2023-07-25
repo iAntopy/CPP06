@@ -6,7 +6,7 @@
 /*   By: iamongeo <iamongeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/23 21:47:52 by iamongeo          #+#    #+#             */
-/*   Updated: 2023/07/23 23:03:06 by iamongeo         ###   ########.fr       */
+/*   Updated: 2023/07/24 19:02:27 by iamongeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,36 +15,18 @@
 
 # include <iostream>
 # include <string>
-# include <cstring>
-# include <cmath>
-
-# define CHAR_MIN_DISPLAYABLE 32
-# define CHAR_MAX_DISPLAYABLE 127
-
-enum e_cast_type
-{
-	ERROR_TYPE,
-	CHAR_TYPE,
-	INT_TYPE,
-	FLOAT_TYPE,
-	DOUBLE_TYPE
-};
-
-enum e_cast_errors
-{
-	CHAR_NONDISP = 0b1,
-	CHAR_IMPOS = 0b10,
-	INT_IMPOS = 0b100
-};
-
+# include <sstream>
+//# include <limits>
 
 typedef struct s_convertion_table
 {
-	std::string		c;
 	int				i;
 	float			f;
 	double			d;
-	int				err_flags;
+	std::string		c_str;
+	std::string		i_str;
+	std::string		f_str;
+	std::string		d_str;
 }	t_conv_tab;
 
 #endif
