@@ -6,7 +6,7 @@
 /*   By: iamongeo <iamongeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/23 21:47:52 by iamongeo          #+#    #+#             */
-/*   Updated: 2023/07/24 19:02:27 by iamongeo         ###   ########.fr       */
+/*   Updated: 2023/07/24 21:34:45 by iamongeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <iostream>
 # include <string>
 # include <sstream>
+# include <cmath>
 //# include <limits>
 
 typedef struct s_convertion_table

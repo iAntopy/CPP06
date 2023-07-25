@@ -6,7 +6,7 @@
 /*   By: iamongeo <iamongeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/23 21:49:42 by iamongeo          #+#    #+#             */
-/*   Updated: 2023/07/24 19:02:00 by iamongeo         ###   ########.fr       */
+/*   Updated: 2023/07/24 21:33:57 by iamongeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,6 @@ bool	is_char_out_of_bounds(int c)
 bool	is_char_non_displayable(int c)
 {
 	return ((0 <= c && c < 32) || c == 127);
-//	return (('0' <= c) && (c <= '9'));
-//	return ((32 <= c && c < 48) || (58 <= c && c < 127));
 }
 
 bool	is_all_space(const std::string& str)
@@ -41,7 +39,7 @@ bool	non_numeric_float_check(const std::string& arg, t_conv_tab& tab)
 	{
 		tab.c_str = "impossible";
 		tab.i_str = "impossible";
-		tab.f_str = "nanf";
+		tab.f_str = "nan";
 		tab.d_str = "nan";
 		return (true);
 	}
@@ -57,125 +55,41 @@ bool	non_numeric_float_check(const std::string& arg, t_conv_tab& tab)
 	}
 	return (false);
 }
-/*
-enum e_cast_type    find_base_type(const std::string& arg)
-{
-	if (std::isdigit(arg[0]))
-	{
-		// is not char
-		if (arg.find('.') == arg.npos)
-			return (INT_TYPE);
-		else if (arg.find('f') != arg.npos)
-			return (FLOAT_TYPE);
-		else
-			return (DOUBLE_TYPE);
-	}
-	else
-	{
-		if (arg.compare(0, 3, "nan") == 0)
-		{
-			// float or double
-			if (arg[3] == 'f')// float
-				return (FLOAT_TYPE);
-			else// double
-				return (DOUBLE_TYPE);
-		}
-		else if (arg.compare(1, 4, "inf") == 0)
-		{
-			// float or double
-			if (arg[4] == 'f')// float
-				return (FLOAT_TYPE);
-			else// double
-				return (DOUBLE_TYPE);
-		}
-		else if (arg.length() < 1)
-			//!((32 <= arg[0] && arg[0] < 48) || (58 <= arg[0] || arg[0] < 127)))
-			return (ERROR_TYPE);
-		else
-			return (CHAR_TYPE);
-	}
-	return (ERROR_TYPE);
-}
-*/
 
 void	convert_table_from_char(const std::string& arg, t_conv_tab& tab)
 {
 	char				c = arg[0];
 	std::ostringstream	os;
 
-	printf("CHAR CONVERSION\n");
 	tab.c_str = '\'';
 	tab.c_str += c;
 	tab.c_str += '\'';
 	
-	tab.i = (int)c;
+	tab.i = static_cast<int>(c);
 	os << tab.i;
 	tab.i_str = os.str();
 	empty_steam(os);
 
-	tab.f = (float)tab.i;
+	tab.f = static_cast<float>(tab.i);
 	os << tab.f;
 	tab.f_str = os.str();
 	empty_steam(os);
 
-	tab.d = (double)tab.f;
+	tab.d = static_cast<double>(tab.f);
 	os << tab.d;
 	tab.d_str = os.str();
 	empty_steam(os);
 }
-/*
-void	convert_table_from_int(const std::string& arg, t_conv_tab& tab)
-{
-	size_t				temp_i = std::stol;
-	std::ostringstream	os;
 
-	printf("INT CONVERSION\n");
-	
-	tab.d = (double)temp_i;
-	if (tab.d > FLT_MAX || tab.d < FLT_MIN)
-		tab.f_str = "impossible";
-	else
-	{
-		tab.f = (float)tab.d;
-		os << tab.f;
-		tab.f_str = os.str();
-		os.flush();
-	}
-	if (tab.f > (float)INT_MAX || tab.f < (float)INT_MIN)
-		tab.i_str = "impossible";
-	else
-	{
-		tab.i = (int)tab.f;
-		os << tab.i;
-		tab.i_str = os.str();
-		os.flush();
-	}
-
-	if (tab.i > (int)CHAR_MAX || tab.i < (int)CHAR_MIN)
-		tab.i_str = "impossible";
-	else
-	{
-		tab.i = (int)tab.f;
-		os << tab.i;
-		tab.i_str = os.str();
-		os.flush();
-	}
-
-	if (is_char_out_of_bounds(tab.i))
-		tab.c_str = "impossible";
-	else if (is_char_non_displayable((char)tab.i))
-		tab.c_str = "Non displayable";
-	else
-		tab.c_str = (char)tab.i;
-}
-*/
-//void	convert_table_from_float(const std::string& arg, t_conv_tab& tab)
 void	convert_generic(const std::string& arg, t_conv_tab& tab)
 {
 	double				temp_d;
 	std::ostringstream	os;
 	
-	printf("GENERIC CONVERSION\n");
+	tab.d_str = "impossible";
+	tab.f_str = "impossible";
+	tab.i_str = "impossible";
+	tab.c_str = "impossible";
 	try
 	{
 		temp_d = std::stod(arg);
@@ -184,36 +98,13 @@ void	convert_generic(const std::string& arg, t_conv_tab& tab)
 		tab.d_str = os.str();
 		empty_steam(os);
 	}
-	catch (std::out_of_range &e)
-	{
-		tab.d_str = "impossible";
-		tab.f_str = "impossible";
-		tab.i_str = "impossible";
-		tab.c_str = "impossible";
-		return ;
-	}
-	catch (std::invalid_argument &e)
-	{
-		tab.d_str = "impossible";
-		tab.f_str = "impossible";
-		tab.i_str = "impossible";
-		tab.c_str = "impossible";
-		return ;
-	}
+	catch (std::out_of_range &e) {
+		return ; }
+	catch (std::invalid_argument &e) {
+		return ; }
 	if (tab.d < std::numeric_limits<float>::lowest()
 		|| std::numeric_limits<float>::max() < tab.d)
-	{
-		std::cout << "Busted float limit" << std::endl;
-		std::cout << "double rep : " << tab.d << std::endl;
-		std::cout << "test1 : " << (tab.d < std::numeric_limits<float>::lowest()) << std::endl;
-		std::cout << "test2 : " << (std::numeric_limits<float>::max() < tab.d) << std::endl;
-		std::cout << "float min : " << std::numeric_limits<float>::lowest() << std::endl;
-		std::cout << "float max : " << std::numeric_limits<float>::max() << std::endl;
-		tab.f_str = "impossible";
-		tab.i_str = "impossible";
-		tab.c_str = "impossible";
 		return ;
-	}
 	else
 	{
 		tab.f = (float)tab.d;
@@ -221,27 +112,21 @@ void	convert_generic(const std::string& arg, t_conv_tab& tab)
 		tab.f_str = os.str();
 		empty_steam(os);
 	}
-	if (tab.f > (float)INT_MAX || tab.f < (float)INT_MIN)
-	{
-		tab.i_str = "impossible";
-		tab.c_str = "impossible";
+	if (tab.f > INT_MAX || tab.f < INT_MIN)
 		return ;
-	}
-	else
+	else if (!std::isnan(tab.f) && !std::isinf(tab.f))
 	{
-		tab.i = (int)tab.f;
+		tab.i = static_cast<int>(tab.f);
 		os << tab.i;
 		tab.i_str = os.str();
 		empty_steam(os);
 	}
 	if (is_char_non_displayable(tab.i))
 		tab.c_str = "Non displayable";
-	else if (is_char_out_of_bounds(tab.i))
-		tab.c_str = "impossible";
-	else
+	else if (!is_char_out_of_bounds(tab.i))
 	{
 		tab.c_str = "'";
-		tab.c_str += (char)tab.i;
+		tab.c_str += static_cast<char>(tab.i);
 		tab.c_str += "'";
 	}
 }
@@ -274,7 +159,6 @@ int main(int argc, char **argv)
 	std::string			arg;
 	t_conv_tab			tab;
 
-	std::cout << "Enter" << std::endl;
 	if (argc != 2)
 	{
 		std::cerr << "Missing argument. Give string litteral to converte to [char, int, float, double]" << std::endl;
