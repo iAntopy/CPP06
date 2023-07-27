@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   caster.hpp                                         :+:      :+:    :+:   */
+/*   caster_alt.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: iamongeo <iamongeo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/23 21:47:52 by iamongeo          #+#    #+#             */
-/*   Updated: 2023/07/24 21:34:45 by iamongeo         ###   ########.fr       */
+/*   Updated: 2023/07/30 21:31:08 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,19 @@
 # include <string>
 # include <sstream>
 # include <cmath>
-//# include <limits>
+# include <limits>
+
+# define DIGITS "0123456789"
+# define DISP_CHAR_MIN 32
+# define DISP_CHAR_MAX 127
+
+enum e_num_type
+{
+	CHAR_TYPE,
+	INT_TYPE,
+	FLT_TYPE,
+	DBL_TYPE
+};
 
 typedef struct s_convertion_table
 {

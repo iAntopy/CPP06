@@ -3,19 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: iamongeo <iamongeo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/23 21:49:42 by iamongeo          #+#    #+#             */
-/*   Updated: 2023/07/24 21:33:57 by iamongeo         ###   ########.fr       */
+/*   Updated: 2023/07/31 17:42:03 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "caster.hpp"
-
-bool	is_char_out_of_bounds(int c)
-{
-	return (c < 32 || 127 < c);
-}
 
 bool	is_char_non_displayable(int c)
 {
@@ -27,13 +22,35 @@ bool	is_all_space(const std::string& str)
 	return (str.find_first_not_of(' ') == str.npos);
 }
 
-void	empty_steam(std::ostringstream& os)
+void	convert_float_to_str(float f, t_conv_tab &tab)
 {
-	os.str("");
-	os.clear();
+	std::ostringstream	os;
+
+	tab.f = f;
+	os << f;
+	tab.f_str = os.str();
 }
 
-bool	non_numeric_float_check(const std::string& arg, t_conv_tab& tab)
+
+void	convert_double_to_str(double d, t_conv_tab &tab)
+{
+	std::ostringstream	os;
+
+	tab.d = d;
+	os << d;
+	tab.d_str = os.str();
+}
+
+void	convert_int_to_str(int i, t_conv_tab &tab)
+{
+	std::ostringstream	os;
+
+	tab.i = i;
+	os << i;
+	tab.i_str = os.str();
+}
+
+bool	non_numeric_float_check(const std::string& arg, enum e_num_type& dtype, t_conv_tab& tab)
 {
 	if (arg.compare(0, 3, "nan") == 0)
 	{
@@ -56,79 +73,161 @@ bool	non_numeric_float_check(const std::string& arg, t_conv_tab& tab)
 	return (false);
 }
 
-void	convert_table_from_char(const std::string& arg, t_conv_tab& tab)
+
+void	convert_from_char(const std::string& arg, t_conv_tab& tab)
 {
 	char				c = arg[0];
-	std::ostringstream	os;
 
+	std::cout << "Convert from char" << std::endl;
 	tab.c_str = '\'';
 	tab.c_str += c;
 	tab.c_str += '\'';
 	
-	tab.i = static_cast<int>(c);
-	os << tab.i;
-	tab.i_str = os.str();
-	empty_steam(os);
-
-	tab.f = static_cast<float>(tab.i);
-	os << tab.f;
-	tab.f_str = os.str();
-	empty_steam(os);
-
-	tab.d = static_cast<double>(tab.f);
-	os << tab.d;
-	tab.d_str = os.str();
-	empty_steam(os);
+	convert_int_to_str(static_cast<int>(c), tab);
+	convert_float_to_str(static_cast<float>(c), tab);
+	convert_double_to_str(static_cast<double>(c), tab);
 }
 
-void	convert_generic(const std::string& arg, t_conv_tab& tab)
+
+void	convert_from_int(const std::string& arg, t_conv_tab& tab)
 {
-	double				temp_d;
-	std::ostringstream	os;
-	
+	ssize_t	nb;
+
+	std::cout << "Convert from int" << std::endl;
 	tab.d_str = "impossible";
 	tab.f_str = "impossible";
 	tab.i_str = "impossible";
 	tab.c_str = "impossible";
-	try
+
+	try {nb = std::stol(arg);}
+	catch (std::exception &e)
 	{
-		temp_d = std::stod(arg);
-		tab.d = temp_d;
-		os << tab.d;
-		tab.d_str = os.str();
-		empty_steam(os);
-	}
-	catch (std::out_of_range &e) {
-		return ; }
-	catch (std::invalid_argument &e) {
-		return ; }
-	if (tab.d < std::numeric_limits<float>::lowest()
-		|| std::numeric_limits<float>::max() < tab.d)
+		std::cerr << "Nb way waaaaaaaayyyy too big. Converter shutdown. Situation critical." << std::endl;
 		return ;
+	}
+
+	if (std::numeric_limits<int>::lowest() <= nb && nb <= std::numeric_limits<int>::max())
+		convert_int_to_str(static_cast<int>(nb), tab);
+	convert_float_to_str(static_cast<float>(tab.i), tab);
+	convert_double_to_str(static_cast<double>(tab.i), tab);
+
+	if (0 <= nb && nb <= 128)
+	{
+		if (is_char_non_displayable(static_cast<char>(tab.i)))
+			tab.c_str = "Non diplayable";
+		else
+			tab.c_str = std::string("\'") + static_cast<char>(tab.i) + '\'';
+	}
+}
+
+
+void	convert_from_float(const std::string& arg, t_conv_tab& tab)
+{
+	double	nb;
+
+	std::cout << "Convert from float" << std::endl;
+	tab.d_str = "impossible";
+	tab.f_str = "impossible";
+	tab.i_str = "impossible";
+	tab.c_str = "impossible";
+
+	try {nb = std::stod(arg);}
+	catch (std::exception &e)
+	{
+		std::cerr << "Nb way waaaaaaaayyyy too big. Converter shutdown. Situation critical." << std::endl;
+		return ;
+	}
+
+	if (std::numeric_limits<float>::lowest() <= nb && nb <= std::numeric_limits<float>::max())
+		convert_float_to_str(static_cast<float>(nb), tab);
+	if (std::numeric_limits<int>::lowest() <= nb && nb <= std::numeric_limits<int>::max())
+		convert_int_to_str(static_cast<int>(tab.f), tab);
+	tab.d = static_cast<double>(tab.f);
+	convert_double_to_str(static_cast<double>(tab.f), tab);
+
+	if (0 <= nb && nb <= 128)
+	{
+		if (is_char_non_displayable(tab.i))
+			tab.c_str = "Non diplayable";
+		else
+			tab.c_str = std::string("\'") + static_cast<char>(tab.i) + '\'';
+	}
+}
+
+void	convert_from_double(const std::string& arg, t_conv_tab& tab)
+{
+	double				nb;
+	std::ostringstream	os;
+
+	std::cout << "Convert from double" << std::endl;
+	tab.d_str = "impossible";
+	tab.f_str = "impossible";
+	tab.i_str = "impossible";
+	tab.c_str = "impossible";
+
+	try {nb = std::stod(arg);}
+	catch (std::exception &e)
+	{
+		std::cerr << "Nb way waaaaaaaayyyy too big. Converter shutdown. Situation critical." << std::endl;
+		return ;
+	}
+
+	convert_double_to_str(static_cast<double>(nb), tab);
+	if (std::numeric_limits<float>::lowest() <= nb && nb <= std::numeric_limits<float>::max())
+		convert_float_to_str(static_cast<float>(tab.d), tab);
+	if (std::numeric_limits<int>::lowest() <= nb && nb <= std::numeric_limits<int>::max())
+		convert_int_to_str(static_cast<int>(tab.d), tab);
+
+	if (0 <= tab.i && tab.i <= 128)
+	{
+		if (is_char_non_displayable(tab.i))
+			tab.c_str = "Non diplayable";
+		else
+			tab.c_str = std::string("\'") + static_cast<char>(tab.i) + '\'';
+	}
+}
+
+bool	find_actual_type(const std::string& arg, enum e_num_type& dtype, t_conv_tab& tab)
+{
+	size_t	p1, p2;
+
+	if (non_numeric_float_check(arg, dtype, tab))
+		return (true);
+	if (!(arg[0] == '-' && arg.length() > 1 && isdigit(arg[1]))
+		&& !isdigit(arg[0]))
+	{
+		if (arg.length() > 1 && arg[1] != ' ')
+			return (false);
+		dtype = CHAR_TYPE;
+		convert_from_char(arg, tab);
+	}
+	else if ((p1 = arg.find('.')) != arg.npos)
+	{
+		if (arg.find_first_not_of(DIGITS, arg[0] == '-') != p1)
+			return (false);
+		if ((p2 = arg.find_first_not_of(DIGITS, p1 + 1)) != arg.npos && (arg[p2] == 'f')
+			&& (arg[p2 + 1] == ' ' || arg[p2 + 1] == '\0'))
+		{
+			std::cout << "arg[p2] == 'f' : " << (arg[p2] == 'f') << std::endl;
+			dtype = FLT_TYPE;
+			convert_from_float(arg, tab);
+		}
+		else if (p2 != arg.npos && arg[p2] != ' ')
+			return (false);
+		else
+		{
+			dtype = DBL_TYPE;
+			convert_from_double(arg, tab);
+		}
+	}
 	else
 	{
-		tab.f = (float)tab.d;
-		os << tab.f;
-		tab.f_str = os.str();
-		empty_steam(os);
+		if ((p1 = arg.find_first_not_of(DIGITS, arg[0] == '-')) != arg.npos && arg[p1] != ' ')
+			return (false);
+		dtype = INT_TYPE;
+		convert_from_int(arg, tab);
 	}
-	if (tab.f > INT_MAX || tab.f < INT_MIN)
-		return ;
-	else if (!std::isnan(tab.f) && !std::isinf(tab.f))
-	{
-		tab.i = static_cast<int>(tab.f);
-		os << tab.i;
-		tab.i_str = os.str();
-		empty_steam(os);
-	}
-	if (is_char_non_displayable(tab.i))
-		tab.c_str = "Non displayable";
-	else if (!is_char_out_of_bounds(tab.i))
-	{
-		tab.c_str = "'";
-		tab.c_str += static_cast<char>(tab.i);
-		tab.c_str += "'";
-	}
+	return (true);
 }
 
 void	print_conversion_table(const t_conv_tab& tab)
@@ -158,6 +257,7 @@ int main(int argc, char **argv)
 {
 	std::string			arg;
 	t_conv_tab			tab;
+	enum e_num_type		dtype;
 
 	if (argc != 2)
 	{
@@ -173,10 +273,11 @@ int main(int argc, char **argv)
 		arg = arg.substr(0, arg.find(' '));
 	}
 
-	if (arg.length() == 1 && !std::isdigit(arg[0]))
-		convert_table_from_char(arg, tab);
-	else if (!non_numeric_float_check(arg, tab))
-		convert_generic(arg, tab);
+	if (!find_actual_type(arg, dtype, tab))
+	{
+		std::cerr << "Error: Conversion not possible." << std::endl;
+		return (EXIT_FAILURE);
+	}
 
 	print_conversion_table(tab);
 	return (0);
