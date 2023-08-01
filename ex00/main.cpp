@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: iamongeo <iamongeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/23 21:49:42 by iamongeo          #+#    #+#             */
-/*   Updated: 2023/07/31 17:42:03 by marvin           ###   ########.fr       */
+/*   Updated: 2023/08/01 15:12:45 by iamongeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,7 +208,6 @@ bool	find_actual_type(const std::string& arg, enum e_num_type& dtype, t_conv_tab
 		if ((p2 = arg.find_first_not_of(DIGITS, p1 + 1)) != arg.npos && (arg[p2] == 'f')
 			&& (arg[p2 + 1] == ' ' || arg[p2 + 1] == '\0'))
 		{
-			std::cout << "arg[p2] == 'f' : " << (arg[p2] == 'f') << std::endl;
 			dtype = FLT_TYPE;
 			convert_from_float(arg, tab);
 		}
